@@ -45,7 +45,11 @@ public:
 bool getHasHDC1080()
 {
     // TODO code to read device and manufacturer ID and return true if a match
-    return false;
+    char manufacturerID[5];
+    char deviceID[5];
+    sprintf(manufacturerID, "%02X", hdc1080.readManufacturerId());
+    sprintf(deviceID, "%02X", hdc1080.readDeviceId());
+    return (strcmp(manufacturerID, "5449") == 0 && strcmp(deviceID, "1050") == 0);
 }
 
 bool getHasSCD30()
@@ -66,6 +70,8 @@ bool getHasVEML7700()
 void CompositeSensor::begin()
 {
     scd30.begin();
+    hdc1080.begin(0x40);
+
     hasSCD30 = getHasSCD30();
     hasBMP388 = getHasBMP388();
     hasVEML7700 = getHasVEML7700();
@@ -75,11 +81,6 @@ void CompositeSensor::begin()
     {
         scd30.setMeasurementInterval(4);
         scd30.setAmbientPressure(1013); // TODO use barometric presssure if available
-    }
-
-    if (hasBMP388) // returns 0 if initialised
-    {
-        // inititialisation goes here
     }
 
     if (hasVEML7700)
