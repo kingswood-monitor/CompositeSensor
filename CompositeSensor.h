@@ -13,6 +13,7 @@
  * 
  *      float temp = mySensor.readTemperature();
  */
+#include <math.h>
 #include "SparkFun_SCD30_Arduino_Library.h"
 #include "Adafruit_VEML7700.h"
 #include "DFRobot_BMP388_I2C.h"
@@ -24,6 +25,8 @@ SCD30 scd30;
 Adafruit_VEML7700 veml7700 = Adafruit_VEML7700();
 DFRobot_BMP388_I2C bmp388;
 ClosedCube_HDC1080 hdc1080;
+
+double Round(double value, int places);
 
 class CompositeSensor
 {
@@ -98,15 +101,15 @@ float CompositeSensor::readTemperature()
 {
     if (hasSCD30)
     {
-        return scd30.getTemperature();
+        return Round(scd30.getTemperature(), 1);
     }
     else if (hasHDC1080)
     {
-        return hdc1080.readTemperature();
+        return Round(hdc1080.readTemperature(), 1);
     }
     else if (hasBMP388)
     {
-        return bmp388.readTemperature();
+        return Round(bmp388.readTemperature(), 1);
     }
     else
     {
@@ -118,11 +121,11 @@ float CompositeSensor::readHumidity()
 {
     if (hasSCD30)
     {
-        return scd30.getHumidity();
+        return Round(scd30.getHumidity(), 0);
     }
     else if (hasHDC1080)
     {
-        return hdc1080.readHumidity();
+        return Round(hdc1080.readHumidity(), 0);
     }
     else
     {
@@ -137,7 +140,7 @@ int CompositeSensor::readCO2()
 
 float CompositeSensor::readLight()
 {
-    return hasVEML7700 ? veml7700.readLux() : 0.0;
+    return hasVEML7700 ? Round(veml7700.readLux(), 0) : 0.0;
 }
 
 int CompositeSensor::readPressure()
@@ -152,5 +155,11 @@ float CompositeSensor::readBattery()
     measuredvbat *= 3.3;  // Multiply by 3.3V, our reference voltage
     measuredvbat /= 1024; // convert to voltage
 
-    return measuredvbat;
+    return Round(measuredvbat, 2);
+}
+
+double Round(double value, int places)
+{
+    double factor = pow(10, places);
+    return ((int)(value * factor)) / factor;
 }
