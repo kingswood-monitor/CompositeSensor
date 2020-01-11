@@ -31,18 +31,32 @@ double Round(double value, int places);
 class CompositeSensor
 {
 public:
+    struct SensorReadings
+    {
+        float temp;
+        float humidity;
+        int co2;
+        float light;
+        int pressure;
+        float battery;
+    };
+
     void begin();
+    SensorReadings readSensors();
+
+    bool hasSCD30 = false;
+    bool hasBMP388 = false;
+    bool hasVEML7700 = false;
+    bool hasHDC1080 = false;
+
+private:
     float readTemperature();
     float readHumidity();
     int readCO2();
     float readLight();
     int readPressure();
     float readBattery();
-
-    bool hasSCD30 = false;
-    bool hasBMP388 = false;
-    bool hasVEML7700 = false;
-    bool hasHDC1080 = false;
+    SensorReadings readingsStruct;
 };
 
 bool getHasHDC1080()
@@ -156,6 +170,18 @@ float CompositeSensor::readBattery()
     measuredvbat /= 1024; // convert to voltage
 
     return Round(measuredvbat, 2);
+}
+
+CompositeSensor::SensorReadings CompositeSensor::readSensors()
+{
+    readingsStruct.temp = CompositeSensor::readTemperature();
+    readingsStruct.humidity = CompositeSensor::readHumidity();
+    readingsStruct.co2 = CompositeSensor::readCO2();
+    readingsStruct.light = CompositeSensor::readLight();
+    readingsStruct.pressure = CompositeSensor::readPressure();
+    readingsStruct.battery = CompositeSensor::readBattery();
+
+    return readingsStruct;
 }
 
 double Round(double value, int places)
