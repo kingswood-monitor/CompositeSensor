@@ -31,14 +31,14 @@ double Round(double value, int places);
 class CompositeSensor
 {
 public:
-    struct SensorReadings
+    struct __attribute__((packed)) SensorReadings
     {
-        float temp;
-        float humidity;
-        int co2;
-        float light;
-        int pressure;
-        float battery;
+        double temp;
+        double humidity;
+        int16_t co2;
+        double light;
+        int16_t pressure;
+        double battery;
     };
 
     void begin();
@@ -96,6 +96,7 @@ void CompositeSensor::begin()
 
     if (hasSCD30)
     {
+        // scd30.begin();
         scd30.setMeasurementInterval(4);
         scd30.setAmbientPressure(1013); // TODO use barometric presssure if available
     }
