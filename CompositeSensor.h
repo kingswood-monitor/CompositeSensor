@@ -19,7 +19,9 @@
 #include "DFRobot_BMP388_I2C.h"
 #include "ClosedCube_HDC1080.h"
 
+#ifdef HAS_BATTERY
 #define VBATPIN A9 // for measuring battery voltage
+#endif
 
 SCD30 scd30;
 Adafruit_VEML7700 veml7700 = Adafruit_VEML7700();
@@ -163,6 +165,7 @@ int CompositeSensor::readPressure()
     return hasBMP388 ? bmp388.readPressure() / 100.0 : 0;
 }
 
+#ifdef HAS_BATTERY
 float CompositeSensor::readBattery()
 {
     float measuredvbat = analogRead(VBATPIN);
@@ -172,6 +175,7 @@ float CompositeSensor::readBattery()
 
     return Round(measuredvbat, 2);
 }
+#endif
 
 CompositeSensor::SensorReadings CompositeSensor::readSensors()
 {
@@ -180,7 +184,9 @@ CompositeSensor::SensorReadings CompositeSensor::readSensors()
     readingsStruct.co2 = CompositeSensor::readCO2();
     readingsStruct.light = CompositeSensor::readLight();
     readingsStruct.pressure = CompositeSensor::readPressure();
+#ifdef HAS_BATTERY
     readingsStruct.battery = CompositeSensor::readBattery();
+#endif
 
     return readingsStruct;
 }
